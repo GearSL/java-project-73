@@ -1,20 +1,41 @@
-run:
-	./gradlew run
-run-dist: build
-	./build/install/app/bin/app
+setup:
+	gradle wrapper --gradle-version 7.3
 
-build: clear
-	./gradlew build
+clean:
+	./gradlew clean
+
+build:
+	./gradlew clean build
+
+start:
+	./gradlew bootRun --args='--spring.profiles.active=dev'
+
+start-prod:
+	./gradlew bootRun --args='--spring.profiles.active=prod'
+
+install:
 	./gradlew installDist
 
-clear:
-	./gradlew clean
+start-dist:
+	./build/install/app/bin/app
+
+lint:
+	./gradlew checkstyleMain checkstyleTest
 
 test:
 	./gradlew test
 
-check:
-	./gradlew check
+report:
+	./gradlew jacocoTestReport
 
-tasks:
-	./gradlew tasks
+check-updates:
+	./gradlew dependencyUpdates
+
+generate-migrations:
+	gradle diffChangeLog
+
+db-migrate:
+	./gradlew update
+
+
+.PHONY: build
