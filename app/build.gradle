@@ -39,7 +39,7 @@ dependencies {
 			'org.springframework.boot:spring-boot-starter-web',
 			'org.springframework.boot:spring-boot-starter-actuator',
 			'org.springframework.boot:spring-boot-starter-validation',
-			//'org.springframework.boot:spring-boot-starter-security',
+			'org.springframework.boot:spring-boot-starter-security',
 			'io.jsonwebtoken:jjwt:0.9.1',
 			// Зависимость для swagger
 			// Позволяет сгенерировать и просматривать интерактивную документацию по API
@@ -72,12 +72,12 @@ dependencies {
 }
 
 wrapper {
-	gradleVersion = '8.2'
+	gradleVersion = '8.2.1'
 	distributionType = Wrapper.DistributionType.ALL
 }
 
 compileJava {
-	options.release = 17
+	options.release = 20
 	options.encoding = 'UTF-8'
 }
 
