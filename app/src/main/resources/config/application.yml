@@ -1,6 +1,10 @@
 server:
   port: ${PORT:5001}
 
+jwt:
+  secrete: UmPOgUMOK4bhoq4ohY41F2GQIo0k0qUcr6ewfh0t3is
+  lifetime: 30m
+
 base-url: /api
 
 spring:

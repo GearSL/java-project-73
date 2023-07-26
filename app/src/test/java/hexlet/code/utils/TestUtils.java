@@ -11,31 +11,30 @@ public class TestUtils {
     @Autowired
     private UserRepository userRepository;
     public static final String TEST_EMAIL = "email@email.com";
-    private final UserDTO userCreationDTO = new UserDTO(
-            TEST_EMAIL,
-            "firstname",
-            "lastname",
-            "pwd"
-    );
+    public static final String TEST_EMAIL_2 = "email_2@email.com";
+    public static final String TEST_PASSWORD = "pwd";
 
-    private final UserDTO userUpdatingDTO = new UserDTO(
-            TEST_EMAIL,
-            "firstname updated",
-            "lastname updated",
-            "pwd updated"
-    );
-
-    public UserDTO getTestUserCreationDto() {
-        return userCreationDTO;
+    public UserDTO getTestUserCreationDto(String email) {
+        return new UserDTO(
+                email,
+                "firstname",
+                "lastname",
+                TEST_PASSWORD
+        );
     }
 
-    public UserDTO getTestUserUpdatingDto() {
-        return userUpdatingDTO;
+    public UserDTO getTestUserUpdatingDto(String email) {
+        return new UserDTO(
+                email,
+                "firstname updated",
+                "lastname updated",
+                "pwd updated"
+        );
     }
 
 
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(TestUtils.TEST_EMAIL).orElseThrow();
+        return userRepository.findByEmail(email).orElseThrow();
     }
 
     public void tearDown() {
