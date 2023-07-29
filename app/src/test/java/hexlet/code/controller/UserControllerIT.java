@@ -10,6 +10,7 @@ import hexlet.code.utils.TestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Nested;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -61,114 +62,131 @@ public class UserControllerIT {
         ).andExpect(status().isOk());
     }
 
-    @Test
-    void checkWelcome() throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(get("/welcome")
-        ).andReturn().getResponse();
+    @Nested
+    class UnprotectedRoutesChecks {
+        @Test
+        void checkWelcome() throws Exception {
+            MockHttpServletResponse response = mockMvc.perform(get("/welcome")
+            ).andReturn().getResponse();
 
-        assertThat(response.getStatus()).isEqualTo(200);
-        assertThat(response.getContentAsString()).contains(WELCOME);
+            assertThat(response.getStatus()).isEqualTo(200);
+            assertThat(response.getContentAsString()).contains(WELCOME);
+        }
+
+        @Test
+        void createUser() {
+            User user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
+            //assertThat(response.getStatus()).isEqualTo(200);
+            assertThat(user.getEmail()).isEqualTo(TestUtils.TEST_EMAIL);
+        }
+
+        @Test
+        void getUser() throws Exception {
+            User user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
+            MockHttpServletResponse response = mockMvc.perform(
+                    get(USER_CONTROLLER_PATH + "/" + user.getId())
+            ).andReturn().getResponse();
+            assertThat(response.getStatus()).isEqualTo(200);
+            assertThat(response.getContentAsString()).contains(TestUtils.TEST_EMAIL);
+        }
+
+        @Test
+        void getUsers() throws Exception {
+            MockHttpServletResponse response = mockMvc.perform(
+                    get(USER_CONTROLLER_PATH)
+            ).andReturn().getResponse();
+            assertThat(response.getStatus()).isEqualTo(200);
+            assertThat(response.getContentAsString()).contains(TestUtils.TEST_EMAIL);
+        }
     }
 
-    @Test
-    void createUser() {
-        User user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
-        //assertThat(response.getStatus()).isEqualTo(200);
-        assertThat(user.getEmail()).isEqualTo(TestUtils.TEST_EMAIL);
+    @Nested
+    class UpdateChecks {
+        //TODO: Need to add fail tests for PUT method
+        @Test
+        void updateUser() throws Exception {
+            // find created user by email
+            User user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
+            UserDTO userForUpdate = utils.getTestUserUpdatingDto(TestUtils.TEST_EMAIL);
+            String oldPasswordHash = user.getPassword();
+            JwtRequestDTO requestDTO = new JwtRequestDTO(TestUtils.TEST_EMAIL, TestUtils.TEST_PASSWORD);
+            MockHttpServletResponse response = mockMvc.perform(post(BASE_URL + "/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(MAPPER.writeValueAsString(requestDTO))
+            ).andReturn().getResponse();
+
+            // try to update created user
+            JwtResponseDTO responseDTO = MAPPER.readValue(response.getContentAsString(), JwtResponseDTO.class);
+            MockHttpServletResponse updateResponse = mockMvc.perform(
+                    put(USER_CONTROLLER_PATH + "/" + user.getId())
+                            .header("Authorization", "Bearer " + responseDTO.getToken())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(MAPPER.writeValueAsString(userForUpdate))
+            ).andReturn().getResponse();
+
+            // checking whether the user's data has been updated
+            user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
+            assertThat(updateResponse.getStatus()).isEqualTo(200);
+            assertThat(user.getEmail()).isEqualTo(userForUpdate.getEmail());
+            assertThat(user.getFirstName()).isEqualTo(userForUpdate.getFirstName());
+            assertThat(user.getLastName()).isEqualTo(userForUpdate.getLastName());
+            // making sure that the password has been changed
+            assertThat(user.getPassword()).isNotEqualTo(oldPasswordHash);
+        }
     }
 
-    @Test
-    void getUser() throws Exception {
-        User user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
-        MockHttpServletResponse response = mockMvc.perform(
-                get(USER_CONTROLLER_PATH + "/" + user.getId())
-        ).andReturn().getResponse();
-        assertThat(response.getStatus()).isEqualTo(200);
-        assertThat(response.getContentAsString()).contains(TestUtils.TEST_EMAIL);
-    }
+    @Nested
+    class DeleteChecks {
+        @Test
+        void deleteUserOwnRecord() throws Exception {
+            // find created user by email
+            User user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
+            assertThat(user).isNotNull();
 
-    @Test
-    void getUsers() throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(
-                get(USER_CONTROLLER_PATH)
-        ).andReturn().getResponse();
-        assertThat(response.getStatus()).isEqualTo(200);
-        assertThat(response.getContentAsString()).contains(TestUtils.TEST_EMAIL);
-    }
+            // try to authenticate
+            JwtRequestDTO requestDTO = new JwtRequestDTO(TestUtils.TEST_EMAIL, TestUtils.TEST_PASSWORD);
+            MockHttpServletResponse response = mockMvc.perform(
+                    post(BASE_URL + "/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(MAPPER.writeValueAsBytes(requestDTO))
+            ).andReturn().getResponse();
+            assertThat(response.getStatus()).isEqualTo(200);
 
-    @Test
-    void updateUser() throws Exception {
-        // find created user by email
-        User user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
-        UserDTO userForUpdate = utils.getTestUserUpdatingDto(TestUtils.TEST_EMAIL);
-        String oldPasswordHash = user.getPassword();
+            // try to delete user
+            JwtResponseDTO responseDTO = MAPPER.readValue(response.getContentAsString(), JwtResponseDTO.class);
+            mockMvc.perform(
+                    delete(USER_CONTROLLER_PATH + "/" + user.getId())
+                            .header("Authorization", "Bearer " + responseDTO.getToken())
+            ).andExpect(status().isOk());
 
-        // try to update created user
-        MockHttpServletResponse updateResponse = mockMvc.perform(
-                put(USER_CONTROLLER_PATH + "/" + user.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(MAPPER.writeValueAsString(userForUpdate))
-        ).andReturn().getResponse();
+            NoSuchElementException exception = assertThrows(NoSuchElementException.class,
+                    () -> utils.getUserByEmail(TestUtils.TEST_EMAIL), "No value present");
+            assertThat(exception.getMessage()).isEqualTo("No value present");
+        }
 
-        // checking whether the user's data has been updated
-        user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
-        assertThat(updateResponse.getStatus()).isEqualTo(200);
-        assertThat(user.getEmail()).isEqualTo(userForUpdate.getEmail());
-        assertThat(user.getFirstName()).isEqualTo(userForUpdate.getFirstName());
-        assertThat(user.getLastName()).isEqualTo(userForUpdate.getLastName());
-        // making sure that the password has been changed
-        assertThat(user.getPassword()).isNotEqualTo(oldPasswordHash);
-    }
+        @Test
+        void deleteSomeoneElseUser() throws Exception {
+            // find created user by email
+            User user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
+            assertThat(user).isNotNull();
 
-    @Test
-    void deleteUserOwnRecord() throws Exception {
-        // find created user by email
-        User user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
-        assertThat(user).isNotNull();
+            // try to authenticate
+            JwtRequestDTO requestDTO = new JwtRequestDTO(TestUtils.TEST_EMAIL, TestUtils.TEST_PASSWORD);
+            MockHttpServletResponse response = mockMvc.perform(
+                    post(BASE_URL + "/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(MAPPER.writeValueAsBytes(requestDTO))
+            ).andReturn().getResponse();
+            assertThat(response.getStatus()).isEqualTo(200);
 
-        // try to authenticate
-        JwtRequestDTO requestDTO = new JwtRequestDTO(TestUtils.TEST_EMAIL, TestUtils.TEST_PASSWORD);
-        MockHttpServletResponse response = mockMvc.perform(
-                post(BASE_URL + "/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(MAPPER.writeValueAsBytes(requestDTO))
-        ).andReturn().getResponse();
-        assertThat(response.getStatus()).isEqualTo(200);
-
-        // try to delete user
-        JwtResponseDTO responseDTO = MAPPER.readValue(response.getContentAsString(), JwtResponseDTO.class);
-        mockMvc.perform(
-                delete(USER_CONTROLLER_PATH + "/" + user.getId())
-                        .header("Authorization", "Bearer " + responseDTO.getToken())
-        ).andExpect(status().isOk());
-
-        NoSuchElementException exception = assertThrows(NoSuchElementException.class,
-                () -> utils.getUserByEmail(TestUtils.TEST_EMAIL), "No value present");
-        assertThat(exception.getMessage()).isEqualTo("No value present");
-    }
-
-    @Test
-    void deleteSomeoneElseUser() throws Exception {
-        // find created user by email
-        User user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
-        assertThat(user).isNotNull();
-
-        // try to authenticate
-        JwtRequestDTO requestDTO = new JwtRequestDTO(TestUtils.TEST_EMAIL, TestUtils.TEST_PASSWORD);
-        MockHttpServletResponse response = mockMvc.perform(
-                post(BASE_URL + "/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(MAPPER.writeValueAsBytes(requestDTO))
-        ).andReturn().getResponse();
-        assertThat(response.getStatus()).isEqualTo(200);
-
-        //try to delete user and check
-        JwtResponseDTO responseDTO = MAPPER.readValue(response.getContentAsString(), JwtResponseDTO.class);
-        User user2 = utils.getUserByEmail(TestUtils.TEST_EMAIL_2);
-        mockMvc.perform(
-                delete(USER_CONTROLLER_PATH + "/" + user2.getId())
-                        .header("Authorization", "Bearer " + responseDTO.getToken())
-        ).andExpect(status().is4xxClientError());
-        assertThat(utils.getUserByEmail(TestUtils.TEST_EMAIL_2)).isNotNull();
+            //try to delete user and check
+            JwtResponseDTO responseDTO = MAPPER.readValue(response.getContentAsString(), JwtResponseDTO.class);
+            User user2 = utils.getUserByEmail(TestUtils.TEST_EMAIL_2);
+            mockMvc.perform(
+                    delete(USER_CONTROLLER_PATH + "/" + user2.getId())
+                            .header("Authorization", "Bearer " + responseDTO.getToken())
+            ).andExpect(status().is4xxClientError());
+            assertThat(utils.getUserByEmail(TestUtils.TEST_EMAIL_2)).isNotNull();
+        }
     }
 }

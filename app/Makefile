@@ -13,7 +13,7 @@ start-prod:
 install:
 	./gradlew installDist
 
-start-dist:
+start-dist: clean install
 	./build/install/app/bin/app
 
 lint:

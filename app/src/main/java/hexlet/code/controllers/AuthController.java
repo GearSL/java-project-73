@@ -28,14 +28,14 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> createUserToken(@RequestBody JwtRequestDTO authRequest) {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(),
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(),
                     authRequest.getPassword()));
         } catch (BadCredentialsException ex) {
             return new ResponseEntity<>(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),
                     "Not correct login or password"), HttpStatus.UNAUTHORIZED);
         }
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getEmail());
         String token = jwtTokenUtils.generateToken(userDetails);
 
         return ResponseEntity.ok(new JwtResponseDTO(token));
