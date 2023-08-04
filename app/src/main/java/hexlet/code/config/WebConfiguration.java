@@ -1,4 +1,4 @@
-package hexlet.code.configs;
+package hexlet.code.config;
 
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,6 +1,6 @@
-package hexlet.code.controllers;
+package hexlet.code.controller;
 
-import hexlet.code.exceptions.ErrorResponse;
+import hexlet.code.exception.ErrorResponse;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.model.User;
 import hexlet.code.service.UserService;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static hexlet.code.controllers.UserController.USER_CONTROLLER_PATH;
+import static hexlet.code.controller.UserController.USER_CONTROLLER_PATH;
 
 @RequiredArgsConstructor
 @RestController

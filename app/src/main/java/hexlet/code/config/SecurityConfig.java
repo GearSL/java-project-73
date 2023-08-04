@@ -1,4 +1,4 @@
-package hexlet.code.configs;
+package hexlet.code.config;
 
 import hexlet.code.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +33,10 @@ public class SecurityConfig {
                 .sessionManagement().disable()
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
-                        //.requestMatchers(HttpMethod.DELETE, "/api/users/*").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/users/*").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/statuses/*").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/statuses/*").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/statuses/*").authenticated()
                         .requestMatchers("/**").permitAll()
                         .anyRequest().permitAll()
                 );

@@ -1,8 +1,8 @@
-package hexlet.code.controllers;
+package hexlet.code.controller;
 
 import hexlet.code.dto.JwtRequestDTO;
 import hexlet.code.dto.JwtResponseDTO;
-import hexlet.code.exceptions.ErrorResponse;
+import hexlet.code.exception.ErrorResponse;
 import hexlet.code.service.UserDetailsServiceImpl;
 import hexlet.code.utils.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package hexlet.code.configs;
+package hexlet.code.config;
 
 import hexlet.code.utils.JwtTokenUtils;
 import io.jsonwebtoken.ExpiredJwtException;
