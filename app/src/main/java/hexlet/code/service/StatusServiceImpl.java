@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class StatusServiceImpl implements StatusService{
+public class StatusServiceImpl implements StatusService {
     private final StatusRepository statusRepository;
 
     @Override

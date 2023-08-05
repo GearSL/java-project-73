@@ -10,5 +10,5 @@ import lombok.Setter;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class StatusDTO {
-    String name;
+    private String name;
 }

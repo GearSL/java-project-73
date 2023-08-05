@@ -20,9 +20,14 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.NoSuchElementException;
 
+import static hexlet.code.util.TestUtils.BASE_URL;
+import static hexlet.code.util.TestUtils.USER_CONTROLLER_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -37,8 +42,6 @@ public class UserControllerIT {
     private TestUtils utils;
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String WELCOME = "Welcome to Spring";
-    private static final String BASE_URL = "/api";
-    private static final String USER_CONTROLLER_PATH = "/api" + UserController.USER_CONTROLLER_PATH;
 
     @AfterEach
     void clear() {
@@ -73,7 +76,6 @@ public class UserControllerIT {
         @Test
         void createUser() {
             User user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
-            //assertThat(response.getStatus()).isEqualTo(200);
             assertThat(user.getEmail()).isEqualTo(TestUtils.TEST_EMAIL);
         }
 

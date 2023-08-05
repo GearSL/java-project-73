@@ -1,6 +1,7 @@
 package hexlet.code.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.controller.StatusController;
 import hexlet.code.controller.UserController;
 import hexlet.code.dto.StatusDTO;
 import hexlet.code.dto.UserDTO;
@@ -10,7 +11,6 @@ import hexlet.code.reporsitory.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
-import org.springframework.test.web.servlet.MockMvc;
 
 @Component
 @ComponentScan(basePackages = "hexlet.code")
@@ -19,8 +19,6 @@ public class TestUtils {
     private UserRepository userRepository;
     @Autowired
     private StatusRepository statusRepository;
-    @Autowired
-    MockMvc mockMvc;
     public static final String TEST_EMAIL = "email@email.com";
     public static final String TEST_EMAIL_2 = "email_2@email.com";
     public static final String TEST_PASSWORD = "pwd";
@@ -28,6 +26,7 @@ public class TestUtils {
     public static final String TEST_STATUS_2 = "Draft";
     public static final String BASE_URL = "/api";
     public static final String USER_CONTROLLER_PATH = BASE_URL + UserController.USER_CONTROLLER_PATH;
+    public static final String STATUS_CONTROLLER_PATH = BASE_URL + StatusController.STATUS_CONTROLLER_PATH;
     public static final ObjectMapper MAPPER = new ObjectMapper();
 
 
@@ -67,6 +66,7 @@ public class TestUtils {
 
     public void tearDown() {
         userRepository.deleteAll();
+        statusRepository.deleteAll();
     }
 
 
