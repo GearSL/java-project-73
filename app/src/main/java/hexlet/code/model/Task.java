@@ -4,31 +4,40 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-
-import static jakarta.persistence.TemporalType.TIMESTAMP;
+import org.hibernate.validator.constraints.Length;
 import java.time.Instant;
+import static jakarta.persistence.TemporalType.TIMESTAMP;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "task_statuses")
-@NoArgsConstructor
-public class TaskStatus {
+@Table(name = "tasks")
+public class Task {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank
+    @Length(min = 1)
     private String name;
+    private String description;
+    @NotBlank
+    @OneToOne
+    private TaskStatus taskStatus;
+    @NotBlank
+    @OneToOne
+    private User author;
+    @OneToOne
+    private User executor;
     @CreationTimestamp
     @Temporal(TIMESTAMP)
     private Instant createdAt;
 
-    public TaskStatus(String name) {
-        this.name = name;
-    }
 }

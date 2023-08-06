@@ -23,7 +23,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @NotBlank
     @Column(unique = true)
     private String email;
@@ -36,4 +36,5 @@ public class User {
     @CreationTimestamp
     @Temporal(TIMESTAMP)
     private Instant createdAt;
+
 }

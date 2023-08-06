@@ -1,8 +1,8 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.StatusDTO;
+import hexlet.code.dto.TaskStatusDTO;
 import hexlet.code.model.TaskStatus;
-import hexlet.code.service.StatusService;
+import hexlet.code.service.TaskStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,32 +23,34 @@ import static hexlet.code.controller.StatusController.STATUS_CONTROLLER_PATH;
 @RestController
 @RequestMapping("${base-url}" + STATUS_CONTROLLER_PATH)
 public class StatusController {
+
     public static final String STATUS_CONTROLLER_PATH = "/statuses";
     public static final String ID = "/{id}";
-    private final StatusService statusService;
+    private final TaskStatusService taskStatusService;
 
     @PostMapping
-    public TaskStatus createStatus(@RequestBody StatusDTO statusDTO) {
-        return statusService.createStatus(statusDTO);
+    public TaskStatus createStatus(@RequestBody TaskStatusDTO taskStatusDTO) {
+        return taskStatusService.createStatus(taskStatusDTO);
     }
 
     @PutMapping(ID)
-    public TaskStatus updateStatus(@PathVariable int id, @RequestBody StatusDTO statusDTO) {
-        return statusService.updateStatus(id, statusDTO);
+    public TaskStatus updateStatus(@PathVariable Long id, @RequestBody TaskStatusDTO taskStatusDTO) {
+        return taskStatusService.updateStatus(id, taskStatusDTO);
     }
 
     @DeleteMapping(ID)
-    public String deleteStatus(@PathVariable int id) {
-        return statusService.deleteStatus(id);
+    public String deleteStatus(@PathVariable Long id) {
+        return taskStatusService.deleteStatus(id);
     }
 
     @GetMapping(ID)
-    public Optional<TaskStatus> getStatusById(@PathVariable int id) {
-        return statusService.getStatusById(id);
+    public Optional<TaskStatus> getStatusById(@PathVariable Long id) {
+        return taskStatusService.getStatusById(id);
     }
 
     @GetMapping
     public List<TaskStatus> getAllStatuses() {
-        return statusService.getAllStatuses();
+        return taskStatusService.getAllStatuses();
     }
+
 }

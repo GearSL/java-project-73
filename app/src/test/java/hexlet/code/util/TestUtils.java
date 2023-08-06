@@ -3,10 +3,10 @@ package hexlet.code.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.controller.StatusController;
 import hexlet.code.controller.UserController;
-import hexlet.code.dto.StatusDTO;
+import hexlet.code.dto.TaskStatusDTO;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.model.User;
-import hexlet.code.reporsitory.StatusRepository;
+import hexlet.code.reporsitory.TaskStatusRepository;
 import hexlet.code.reporsitory.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -18,7 +18,7 @@ public class TestUtils {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private StatusRepository statusRepository;
+    private TaskStatusRepository taskStatusRepository;
     public static final String TEST_EMAIL = "email@email.com";
     public static final String TEST_EMAIL_2 = "email_2@email.com";
     public static final String TEST_PASSWORD = "pwd";
@@ -48,25 +48,25 @@ public class TestUtils {
         );
     }
 
-    public StatusDTO getTestStatusCreationDTO() {
-        return new StatusDTO(TEST_STATUS);
+    public TaskStatusDTO getTestStatusCreationDTO() {
+        return new TaskStatusDTO(TEST_STATUS);
     }
 
-    public StatusDTO getTestStatusUpdatingDTO() {
-        return new StatusDTO(TEST_STATUS_2);
+    public TaskStatusDTO getTestStatusUpdatingDTO() {
+        return new TaskStatusDTO(TEST_STATUS_2);
     }
 
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow();
     }
 
-    public int getExactStatusId() {
-        return statusRepository.findAll().get(0).getId();
+    public Long getExactStatusId() {
+        return taskStatusRepository.findAll().get(0).getId();
     }
 
     public void tearDown() {
         userRepository.deleteAll();
-        statusRepository.deleteAll();
+        taskStatusRepository.deleteAll();
     }
 
 

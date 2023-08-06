@@ -37,6 +37,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/statuses/*").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/statuses/*").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/statuses/*").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/tasks/*").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/tasks/*").authenticated()
                         .requestMatchers("/**").permitAll()
                         .anyRequest().permitAll()
                 );

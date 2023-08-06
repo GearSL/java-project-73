@@ -116,7 +116,7 @@ liquibase {
 			// Это база данных, изначально она пустая
 			url 'jdbc:h2:./spring'
 			// Сравниваем с моделями, задавая пакет
-			referenceUrl 'hibernate:spring:hexlet.code.models.' +
+			referenceUrl 'hibernate:spring:hexlet.code.model.' +
 					// Указываем диалект
 					'?dialect=org.hibernate.dialect.H2Dialect' +
 					// Указываем правила именования таблиц и столбцов,
