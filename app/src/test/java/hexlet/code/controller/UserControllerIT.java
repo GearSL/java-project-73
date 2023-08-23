@@ -1,8 +1,6 @@
 package hexlet.code.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hexlet.code.dto.JwtRequestDTO;
-import hexlet.code.dto.JwtResponseDTO;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.model.User;
 import hexlet.code.reporsitory.UserRepository;
@@ -20,13 +18,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.NoSuchElementException;
 
-import static hexlet.code.util.TestUtils.BASE_URL;
 import static hexlet.code.util.TestUtils.USER_CONTROLLER_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,23 +39,16 @@ public class UserControllerIT {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String WELCOME = "Welcome to Spring";
 
-    @AfterEach
-    void clear() {
-        utils.tearDown();
-    }
-
     @BeforeEach
     void init() throws Exception {
         // create new user
-        mockMvc.perform(post(USER_CONTROLLER_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(MAPPER.writeValueAsString(utils.getTestUserCreationDto(TestUtils.TEST_EMAIL)))
-        ).andExpect(status().isOk());
+        utils.createUser(TestUtils.USER_DTO_1);
+        utils.createUser(TestUtils.USER_DTO_2);
+    }
 
-        mockMvc.perform(post(USER_CONTROLLER_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(MAPPER.writeValueAsString(utils.getTestUserCreationDto(TestUtils.TEST_EMAIL_2)))
-        ).andExpect(status().isOk());
+    @AfterEach
+    void clear() {
+        utils.tearDown();
     }
 
     @Nested
@@ -74,19 +63,13 @@ public class UserControllerIT {
         }
 
         @Test
-        void createUser() {
-            User user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
-            assertThat(user.getEmail()).isEqualTo(TestUtils.TEST_EMAIL);
-        }
-
-        @Test
         void getUser() throws Exception {
-            User user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
+            User user = utils.getUserByEmail(TestUtils.TEST_EMAIL_1);
             MockHttpServletResponse response = mockMvc.perform(
                     get(USER_CONTROLLER_PATH + "/" + user.getId())
             ).andReturn().getResponse();
             assertThat(response.getStatus()).isEqualTo(200);
-            assertThat(response.getContentAsString()).contains(TestUtils.TEST_EMAIL);
+            assertThat(response.getContentAsString()).contains(TestUtils.TEST_EMAIL_1);
         }
 
         @Test
@@ -95,42 +78,58 @@ public class UserControllerIT {
                     get(USER_CONTROLLER_PATH)
             ).andReturn().getResponse();
             assertThat(response.getStatus()).isEqualTo(200);
-            assertThat(response.getContentAsString()).contains(TestUtils.TEST_EMAIL);
+            assertThat(response.getContentAsString()).contains(TestUtils.TEST_EMAIL_1);
+            assertThat(response.getContentAsString()).contains(TestUtils.TEST_EMAIL_2);
         }
     }
 
     @Nested
     class UpdateChecks {
-        //TODO: Need to add fail tests for PUT method
         @Test
         void updateUser() throws Exception {
-            // find created user by email
-            User user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
-            UserDTO userForUpdate = utils.getTestUserUpdatingDto(TestUtils.TEST_EMAIL);
-            String oldPasswordHash = user.getPassword();
-            JwtRequestDTO requestDTO = new JwtRequestDTO(TestUtils.TEST_EMAIL, TestUtils.TEST_PASSWORD);
-            MockHttpServletResponse response = mockMvc.perform(post(BASE_URL + "/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(MAPPER.writeValueAsString(requestDTO))
-            ).andReturn().getResponse();
+            // find created user by email and store his password hash
+            User userBeforeUpdate = utils.getUserByEmail(TestUtils.TEST_EMAIL_1);
+            String passwordBeforeUpdate = utils.getUserByEmail(TestUtils.TEST_EMAIL_1).getPassword();
+            UserDTO userUpdateDto = new UserDTO(
+                    "updated_email@mail.com",
+                    "firstname",
+                    "lastname",
+                    "updated_password"
+            );
 
-            // try to update created user
-            JwtResponseDTO responseDTO = MAPPER.readValue(response.getContentAsString(), JwtResponseDTO.class);
             MockHttpServletResponse updateResponse = mockMvc.perform(
-                    put(USER_CONTROLLER_PATH + "/" + user.getId())
-                            .header("Authorization", "Bearer " + responseDTO.getToken())
+                    put(USER_CONTROLLER_PATH + "/" + userBeforeUpdate.getId())
+                            .header("Authorization", "Bearer "
+                                    + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(MAPPER.writeValueAsString(userForUpdate))
+                            .content(MAPPER.writeValueAsString(userUpdateDto))
             ).andReturn().getResponse();
 
             // checking whether the user's data has been updated
-            user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
+            User userAfterUpdate = utils.getUserByEmail(userUpdateDto.getEmail());
+            System.out.println("UPDATE RESPONSE: " + updateResponse.getContentAsString());
             assertThat(updateResponse.getStatus()).isEqualTo(200);
-            assertThat(user.getEmail()).isEqualTo(userForUpdate.getEmail());
-            assertThat(user.getFirstName()).isEqualTo(userForUpdate.getFirstName());
-            assertThat(user.getLastName()).isEqualTo(userForUpdate.getLastName());
+            assertThat(userAfterUpdate.getEmail()).isEqualTo(userUpdateDto.getEmail());
+            assertThat(userAfterUpdate.getFirstName()).isEqualTo(userUpdateDto.getFirstName());
+            assertThat(userAfterUpdate.getLastName()).isEqualTo(userUpdateDto.getLastName());
             // making sure that the password has been changed
-            assertThat(user.getPassword()).isNotEqualTo(oldPasswordHash);
+            assertThat(userAfterUpdate.getPassword()).isNotEqualTo(passwordBeforeUpdate);
+        }
+
+        @Test
+        void updateUserFail() throws Exception {
+            User user = utils.getUserByEmail(TestUtils.TEST_EMAIL_1);
+            UserDTO userUpdateDto = TestUtils.USER_DTO_2;
+
+            MockHttpServletResponse updateResponse = mockMvc.perform(
+                    put(USER_CONTROLLER_PATH + "/" + user.getId())
+                            .header("Authorization", "Bearer "
+                                    + utils.getJwtToken(TestUtils.TEST_EMAIL_2, TestUtils.TEST_PASSWORD_2))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(MAPPER.writeValueAsString(userUpdateDto))
+            ).andReturn().getResponse();
+            // making sure that user can't remove another user
+            assertThat(updateResponse.getStatus()).isEqualTo(403);
         }
     }
 
@@ -139,53 +138,31 @@ public class UserControllerIT {
         @Test
         void deleteUserOwnRecord() throws Exception {
             // find created user by email
-            User user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
+            User user = utils.getUserByEmail(TestUtils.TEST_EMAIL_1);
             assertThat(user).isNotNull();
 
             // try to authenticate
-            JwtRequestDTO requestDTO = new JwtRequestDTO(TestUtils.TEST_EMAIL, TestUtils.TEST_PASSWORD);
-            MockHttpServletResponse response = mockMvc.perform(
-                    post(BASE_URL + "/login")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(MAPPER.writeValueAsBytes(requestDTO))
-            ).andReturn().getResponse();
-            assertThat(response.getStatus()).isEqualTo(200);
-
-            // try to delete user
-            JwtResponseDTO responseDTO = MAPPER.readValue(response.getContentAsString(), JwtResponseDTO.class);
             mockMvc.perform(
                     delete(USER_CONTROLLER_PATH + "/" + user.getId())
-                            .header("Authorization", "Bearer " + responseDTO.getToken())
+                            .header("Authorization", "Bearer "
+                                    + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
             ).andExpect(status().isOk());
 
             NoSuchElementException exception = assertThrows(NoSuchElementException.class,
-                    () -> utils.getUserByEmail(TestUtils.TEST_EMAIL), "No value present");
+                    () -> utils.getUserByEmail(TestUtils.TEST_EMAIL_1), "No value present");
             assertThat(exception.getMessage()).isEqualTo("No value present");
         }
 
         @Test
         void deleteSomeoneElseUser() throws Exception {
-            // find created user by email
-            User user = utils.getUserByEmail(TestUtils.TEST_EMAIL);
-            assertThat(user).isNotNull();
-
-            // try to authenticate
-            JwtRequestDTO requestDTO = new JwtRequestDTO(TestUtils.TEST_EMAIL, TestUtils.TEST_PASSWORD);
+            User user = utils.getUserByEmail(TestUtils.TEST_EMAIL_2);
             MockHttpServletResponse response = mockMvc.perform(
-                    post(BASE_URL + "/login")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(MAPPER.writeValueAsBytes(requestDTO))
+                    delete(USER_CONTROLLER_PATH + "/" + user.getId())
+                            .header("Authorization", "Bearer "
+                                    + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
             ).andReturn().getResponse();
-            assertThat(response.getStatus()).isEqualTo(200);
-
-            //try to delete user and check
-            JwtResponseDTO responseDTO = MAPPER.readValue(response.getContentAsString(), JwtResponseDTO.class);
-            User user2 = utils.getUserByEmail(TestUtils.TEST_EMAIL_2);
-            mockMvc.perform(
-                    delete(USER_CONTROLLER_PATH + "/" + user2.getId())
-                            .header("Authorization", "Bearer " + responseDTO.getToken())
-            ).andExpect(status().is4xxClientError());
             assertThat(utils.getUserByEmail(TestUtils.TEST_EMAIL_2)).isNotNull();
+            assertThat(response.getStatus()).isEqualTo(403);
         }
     }
 }

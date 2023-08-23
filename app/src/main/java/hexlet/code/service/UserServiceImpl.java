@@ -17,7 +17,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public Optional<User> getUser(long id) {
+    public Optional<User> getUser(Long id) {
         return userRepository.findById(id);
     }
 
@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(long id, UserDTO userDTO) {
+    public User updateUser(Long id, UserDTO userDTO) {
         User user = userRepository.findById(id).orElseThrow();
         user.setEmail(userDTO.getEmail());
         user.setFirstName(userDTO.getFirstName());
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String deleteUser(long id) {
+    public String deleteUser(Long id) {
         userRepository.findById(id).orElseThrow();
         userRepository.deleteById(id);
 

@@ -1,6 +1,6 @@
 databaseChangeLog:
 - changeSet:
-    id: 1691251793634-1
+    id: 1692436094994-1
     author: ilyasismailov (generated)
     changes:
     - createTable:
@@ -21,7 +21,7 @@ databaseChangeLog:
             type: VARCHAR(255)
         tableName: task_statuses
 - changeSet:
-    id: 1691251793634-2
+    id: 1692436094994-2
     author: ilyasismailov (generated)
     changes:
     - createTable:
@@ -54,7 +54,7 @@ databaseChangeLog:
             type: BIGINT
         tableName: tasks
 - changeSet:
-    id: 1691251793634-3
+    id: 1692436094994-3
     author: ilyasismailov (generated)
     changes:
     - createTable:
@@ -84,7 +84,7 @@ databaseChangeLog:
             type: VARCHAR(255)
         tableName: users
 - changeSet:
-    id: 1691251793634-4
+    id: 1692436094994-4
     author: ilyasismailov (generated)
     changes:
     - addForeignKeyConstraint:
@@ -97,7 +97,7 @@ databaseChangeLog:
         referencedTableName: task_statuses
         validate: true
 - changeSet:
-    id: 1691251793634-5
+    id: 1692436094994-5
     author: ilyasismailov (generated)
     changes:
     - addForeignKeyConstraint:
@@ -110,7 +110,7 @@ databaseChangeLog:
         referencedTableName: users
         validate: true
 - changeSet:
-    id: 1691251793634-6
+    id: 1692436094994-6
     author: ilyasismailov (generated)
     changes:
     - addForeignKeyConstraint:

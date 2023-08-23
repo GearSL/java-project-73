@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Optional;
 
-import static hexlet.code.controller.StatusController.STATUS_CONTROLLER_PATH;
+import static hexlet.code.controller.TaskStatusController.STATUS_CONTROLLER_PATH;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("${base-url}" + STATUS_CONTROLLER_PATH)
-public class StatusController {
+public class TaskStatusController {
 
     public static final String STATUS_CONTROLLER_PATH = "/statuses";
     public static final String ID = "/{id}";

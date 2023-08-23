@@ -6,9 +6,9 @@ import hexlet.code.model.User;
 import java.util.List;
 
 public interface UserService {
-    Optional<User> getUser(long id);
+    Optional<User> getUser(Long id);
     List<User> getUsers();
     User createUser(UserDTO userDTO);
-    User updateUser(long id, UserDTO userDTO);
-    String deleteUser(long id);
+    User updateUser(Long id, UserDTO userDTO);
+    String deleteUser(Long id);
 }

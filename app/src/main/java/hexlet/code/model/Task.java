@@ -4,7 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.validation.constraints.NotBlank;
@@ -28,13 +28,11 @@ public class Task {
     @Length(min = 1)
     private String name;
     private String description;
-    @NotBlank
-    @OneToOne
+    @ManyToOne
     private TaskStatus taskStatus;
-    @NotBlank
-    @OneToOne
+    @ManyToOne
     private User author;
-    @OneToOne
+    @ManyToOne
     private User executor;
     @CreationTimestamp
     @Temporal(TIMESTAMP)

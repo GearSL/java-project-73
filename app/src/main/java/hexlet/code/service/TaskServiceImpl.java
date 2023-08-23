@@ -38,11 +38,13 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Task updateTask(Long id, TaskUpdateDTO taskUpdateDTO) {
         TaskStatus taskStatus = taskStatusRepository.findById(taskUpdateDTO.getTaskStatusId()).orElseThrow();
+        User author = taskRepository.findById(id).get().getAuthor();
         User executor = userRepository.findById(taskUpdateDTO.getExecutorId()).orElseThrow();
 
         Task task = new Task();
         task.setName(taskUpdateDTO.getName());
         task.setDescription(taskUpdateDTO.getDescription());
+        task.setAuthor(author);
         task.setExecutor(executor);
         task.setTaskStatus(taskStatus);
         return taskRepository.save(task);

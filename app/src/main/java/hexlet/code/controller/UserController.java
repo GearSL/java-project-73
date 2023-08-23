@@ -54,7 +54,7 @@ public class UserController {
 
     @PutMapping(ID)
     @PreAuthorize(ONLY_OWNER_BY_ID)
-    public User updateUser(@PathVariable long id, @RequestBody @Valid UserDTO userDTO) {
+    public User updateUser(@PathVariable Long id, @RequestBody @Valid UserDTO userDTO) {
         return userService.updateUser(id, userDTO);
     }
 
@@ -86,11 +86,11 @@ public class UserController {
                 .body(new ErrorResponse(422, "Validation error"));
     }
 
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleException(Exception ex) {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponse(500, "Unknown error"));
-    }
+//    @ExceptionHandler
+//    public ResponseEntity<ErrorResponse> handleException(Exception ex) {
+//        return ResponseEntity
+//                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                .body(new ErrorResponse(500, "Unknown error"));
+//    }
 
 }
