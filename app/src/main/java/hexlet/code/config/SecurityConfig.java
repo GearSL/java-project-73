@@ -34,11 +34,12 @@ public class SecurityConfig {
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.DELETE, "/api/users/*").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/statuses/*").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/statuses/*").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/statuses/*").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/tasks/*").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/tasks/*").authenticated()
+                        .requestMatchers("/api/statuses").authenticated()
+                        .requestMatchers("/api/statuses/*").authenticated()
+                        .requestMatchers("/api/tasks").authenticated()
+                        .requestMatchers("/api/tasks/*").authenticated()
+                        .requestMatchers("/api/labels").authenticated()
+                        .requestMatchers("/api/labels/*").authenticated()
                         .requestMatchers("/**").permitAll()
                         .anyRequest().permitAll()
                 );

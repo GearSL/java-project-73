@@ -1,7 +1,6 @@
 package hexlet.code.controller;
 
 import hexlet.code.dto.JwtRequestDTO;
-import hexlet.code.dto.JwtResponseDTO;
 import hexlet.code.exception.ErrorResponse;
 import hexlet.code.service.UserDetailsServiceImpl;
 import hexlet.code.utils.JwtTokenUtils;
@@ -38,6 +37,6 @@ public class AuthController {
         UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getEmail());
         String token = jwtTokenUtils.generateToken(userDetails);
 
-        return ResponseEntity.ok(new JwtResponseDTO(token));
+        return ResponseEntity.ok(token);
     }
 }

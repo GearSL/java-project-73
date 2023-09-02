@@ -1,15 +1,17 @@
 package hexlet.code.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.controller.LabelController;
 import hexlet.code.controller.TaskStatusController;
 import hexlet.code.controller.UserController;
 import hexlet.code.dto.JwtRequestDTO;
-import hexlet.code.dto.JwtResponseDTO;
+import hexlet.code.dto.LabelDTO;
 import hexlet.code.dto.TaskDTO;
 import hexlet.code.dto.TaskStatusDTO;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.model.Task;
 import hexlet.code.model.User;
+import hexlet.code.reporsitory.LabelRepository;
 import hexlet.code.reporsitory.TaskRepository;
 import hexlet.code.reporsitory.TaskStatusRepository;
 import hexlet.code.reporsitory.UserRepository;
@@ -35,6 +37,8 @@ public class TestUtils {
     private TaskStatusRepository taskStatusRepository;
     @Autowired
     private TaskRepository taskRepository;
+    @Autowired
+    private LabelRepository labelRepository;
     private static WebApplicationContext webApplicationContext;
     private static MockMvc mockMvc;
     public static final String TEST_EMAIL_1 = "email@email.com";
@@ -45,9 +49,12 @@ public class TestUtils {
     public static final String TEST_STATUS_2 = "Draft";
     public static final String TASK_NAME = "Test task";
     public static final String TASK_DESCRIPTION = "Test description";
+    public static final String LABEL_NAME_1 = "Test label 1";
+    public static final String LABEL_NAME_2 = "Test label 2";
     public static final String BASE_URL = "/api";
     public static final String USER_CONTROLLER_PATH = BASE_URL + UserController.USER_CONTROLLER_PATH;
     public static final String STATUS_CONTROLLER_PATH = BASE_URL + TaskStatusController.STATUS_CONTROLLER_PATH;
+    public static final String LABEL_CONTROLLER_PATH = BASE_URL + LabelController.LABEL_CONTROLLER_PATH;
 
     public static final UserDTO USER_DTO_1 = new UserDTO(
             TEST_EMAIL_1,
@@ -64,6 +71,8 @@ public class TestUtils {
     public static final TaskStatusDTO TASK_STATUS_DTO_1 = new TaskStatusDTO(TEST_STATUS_1);
 
     public static final TaskStatusDTO TASK_STATUS_DTO_2 = new TaskStatusDTO(TEST_STATUS_2);
+    public static final LabelDTO LABEL_DTO_1 = new LabelDTO(LABEL_NAME_1);
+    public static final LabelDTO LABEL_DTO_2 = new LabelDTO(LABEL_NAME_2);
 
     public static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -87,6 +96,9 @@ public class TestUtils {
 
     public Long getStatusId() {
         return taskStatusRepository.findAll().get(0).getId();
+    }
+    public Long getLabelId() {
+        return labelRepository.findAll().get(0).getId();
     }
 
     public Optional<Task> findByName(String name) {
@@ -119,14 +131,21 @@ public class TestUtils {
         ).andExpect(status().isOk());
     }
 
+    public void createLabel(LabelDTO labelDTO) throws Exception {
+        MockMvc mockMvc = getMockMvc();
+        mockMvc.perform(post(BASE_URL + "/labels")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(MAPPER.writeValueAsString(labelDTO))
+        ).andExpect(status().isOk());
+    }
+
     public String getJwtToken(String email, String password) throws Exception {
         JwtRequestDTO requestDTO = new JwtRequestDTO(email, password);
         MockHttpServletResponse authResponse = mockMvc.perform(post(BASE_URL + "/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(MAPPER.writeValueAsString(requestDTO))
         ).andReturn().getResponse();
-        JwtResponseDTO responseDTO = MAPPER.readValue(authResponse.getContentAsString(), JwtResponseDTO.class);
-        return responseDTO.getToken();
+        return authResponse.getContentAsString();
     }
 
     public void tearDown() {

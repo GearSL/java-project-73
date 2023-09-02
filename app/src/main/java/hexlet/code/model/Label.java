@@ -1,18 +1,17 @@
 package hexlet.code.model;
 
-import jakarta.persistence.CascadeType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.Length;
@@ -20,36 +19,26 @@ import org.hibernate.validator.constraints.Length;
 import java.time.Instant;
 import java.util.Set;
 
-import static jakarta.persistence.TemporalType.TIMESTAMP;
-
-@Getter
-@Setter
 @Entity
-@Table(name = "tasks")
-public class Task {
-
+@Setter
+@Getter
+@Table(name = "labels")
+@NoArgsConstructor
+public class Label {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotBlank
     @Length(min = 1)
     private String name;
-    private String description;
-    @ManyToOne
-    private TaskStatus taskStatus;
-    @ManyToOne
-    private User author;
-    @ManyToOne
-    private User executor;
-    @ManyToMany(cascade = CascadeType.DETACH)
-    @JoinTable(
-            name = "tasks_labels",
-            joinColumns = @JoinColumn(name = "task_id"),
-            inverseJoinColumns = @JoinColumn(name = "label_id")
-    )
-    private Set<Label> labels;
+    @ManyToMany(mappedBy = "labels")
+    @JsonIgnore
+    private Set<Task> tasks;
     @CreationTimestamp
-    @Temporal(TIMESTAMP)
+    @Temporal(TemporalType.TIMESTAMP)
     private Instant createdAt;
 
+    public Label(String name) {
+        this.name = name;
+    }
 }

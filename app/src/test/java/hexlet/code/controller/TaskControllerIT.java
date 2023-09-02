@@ -77,6 +77,8 @@ public class TaskControllerIT {
         void getTaskList() throws Exception {
             MockHttpServletResponse response = mockMvc.perform(
                     get(TestUtils.BASE_URL + "/tasks")
+                            .header("Authorization", "Bearer "
+                                    + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
                             .contentType(MediaType.APPLICATION_JSON)
             ).andExpect(status().isOk()).andReturn().getResponse();
 

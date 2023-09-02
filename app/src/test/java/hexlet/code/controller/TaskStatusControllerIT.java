@@ -46,6 +46,8 @@ public class TaskStatusControllerIT {
         void getAllStatuses() throws Exception {
             MockHttpServletResponse response = mockMvc.perform(
                     get(TestUtils.STATUS_CONTROLLER_PATH)
+                            .header("Authorization", "Bearer "
+                                    + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
             ).andReturn().getResponse();
             assertThat(response.getStatus()).isEqualTo(200);
             assertThat(response.getContentAsString()).contains(TestUtils.TEST_STATUS_1);
@@ -55,6 +57,8 @@ public class TaskStatusControllerIT {
         void getStatusById() throws Exception {
             MockHttpServletResponse response = mockMvc.perform(
                     get(TestUtils.STATUS_CONTROLLER_PATH + "/" + utils.getStatusId())
+                            .header("Authorization", "Bearer "
+                                    + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
             ).andReturn().getResponse();
             assertThat(response.getStatus()).isEqualTo(200);
             assertThat(response.getContentAsString()).contains(TestUtils.TEST_STATUS_1);

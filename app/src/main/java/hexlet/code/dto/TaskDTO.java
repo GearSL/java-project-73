@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -15,9 +17,17 @@ public class TaskDTO {
     @Length(min = 1)
     private String name;
     private String description;
-    @NotNull
     private Long authorId;
     private Long executorId;
+    private List<Long> labelIds;
     @NotNull
     private Long taskStatusId;
+
+    public TaskDTO(String taskName, String taskDescription, Long authorId, Long executorId, Long statusId) {
+        this.name = taskName;
+        this.description = taskDescription;
+        this.authorId = authorId;
+        this.executorId = executorId;
+        this.taskStatusId = statusId;
+    }
 }
