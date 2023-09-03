@@ -25,4 +25,4 @@ spring:
       ddl-auto: create-drop
 
 rollbar:
-  access-token: ${ROLLBAR_ACCESS_TOKEN}
+  access-token: ${ROLLBAR_ACCESS_TOKEN:8ca93a30234349f5b0a3cd31f8723fe3}
