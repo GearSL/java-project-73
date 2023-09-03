@@ -1,5 +1,6 @@
 package hexlet.code.controller;
 
+import com.rollbar.notifier.Rollbar;
 import hexlet.code.exception.ErrorResponse;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.model.User;
@@ -33,6 +34,7 @@ public class UserController {
     public static final String USER_CONTROLLER_PATH = "/users";
     public static final String ID = "/{id}";
     private final UserService userService;
+    private final Rollbar rollbar;
     private static final String ONLY_OWNER_BY_ID = """
             @userRepository.findById(#id).get().getEmail() == authentication.getName()
         """;
@@ -49,6 +51,7 @@ public class UserController {
 
     @PostMapping
     public User createUser(@RequestBody @Valid UserDTO userDTO) {
+        rollbar.debug("Here is some debug message");
         return userService.createUser(userDTO);
     }
 
@@ -85,12 +88,4 @@ public class UserController {
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(new ErrorResponse(422, "Validation error"));
     }
-
-//    @ExceptionHandler
-//    public ResponseEntity<ErrorResponse> handleException(Exception ex) {
-//        return ResponseEntity
-//                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                .body(new ErrorResponse(500, "Unknown error"));
-//    }
-
 }
