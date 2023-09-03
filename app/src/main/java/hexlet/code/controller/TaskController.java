@@ -6,6 +6,8 @@ import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.model.Task;
 import hexlet.code.reporsitory.TaskRepository;
 import hexlet.code.service.TaskService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
@@ -26,6 +28,7 @@ import static hexlet.code.controller.TaskController.TASK_CONTROLLER_PATH;
 @RestController
 @RequiredArgsConstructor
 @EnableSpringDataWebSupport
+@SecurityRequirement(name = "spring_app")
 @RequestMapping("${base-url}" + TASK_CONTROLLER_PATH)
 public class TaskController {
 
@@ -39,28 +42,33 @@ public class TaskController {
         """;
 
     @PostMapping
+    @Operation(summary = "Create task")
     public Task createTask(@RequestBody @Valid TaskDTO taskDTO) {
         return taskService.createTask(taskDTO);
     }
 
     @PutMapping(ID)
+    @Operation(summary = "Update task")
     public Task updateTask(@PathVariable Long id, @RequestBody @Valid TaskUpdateDTO taskUpdateDTO) {
         return taskService.updateTask(id, taskUpdateDTO);
     }
 
     @PreAuthorize(ONLY_OWNER_BY_ID)
     @DeleteMapping(ID)
+    @Operation(summary = "Delete task")
     public String deleteTask(@PathVariable Long id) {
         return taskService.deleteTask(id);
     }
 
     @GetMapping(ID)
+    @Operation(summary = "Get task by id")
     public Task getTaskById(@PathVariable Long id) {
         return taskService.getTaskById(id).orElseThrow();
     }
 
     @GetMapping
     @ResponseBody
+    @Operation(summary = "Get all tasks")
     public Iterable<Task> getAllTasks(@QuerydslPredicate(root = Task.class) Predicate predicate) {
         return taskRepository.findAll(predicate);
     }

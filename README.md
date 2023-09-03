@@ -42,3 +42,6 @@ JDBC_DATABASE_PASSWORD
 
 ### Start application
 Start application using Dockerfile in project root. 
+
+### Additional information
+Application have api documentation. You can see it on the link: `http://{host}/swagger-ui`
