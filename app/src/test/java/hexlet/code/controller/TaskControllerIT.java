@@ -134,4 +134,45 @@ public class TaskControllerIT {
             assertThat(response.getStatus()).isEqualTo(403);
         }
     }
+
+    @Nested
+    class FilterCheck {
+        @Test
+        void successFilter() throws Exception {
+            // create additional task
+            String taskName = "Task name 2";
+            Long userId = utils.getUserByEmail(TestUtils.USER_DTO_1.getEmail()).getId();
+            Long statusId = utils.getStatusId();
+            TaskDTO taskDTO = new TaskDTO(
+                    taskName,
+                    TestUtils.TASK_DESCRIPTION,
+                    userId,
+                    userId,
+                    statusId
+            );
+            utils.createTask(taskDTO);
+            // check filter
+            MockHttpServletResponse response = mockMvc.perform(
+                    get(TestUtils.BASE_URL + "/tasks?name=" + TestUtils.TASK_NAME)
+                            .header("Authorization", "Bearer "
+                                    + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
+                            .contentType(MediaType.APPLICATION_JSON)
+            ).andReturn().getResponse();
+
+            assertThat(response.getStatus()).isEqualTo(200);
+            assertThat(response.getContentAsString()).isNotBlank();
+            assertThat(response.getContentAsString()).contains(TestUtils.TASK_NAME);
+            assertThat(response.getContentAsString()).doesNotContain(taskName);
+        }
+
+        @Test
+        void failedFilter() throws Exception {
+            MockHttpServletResponse response = mockMvc.perform(
+                    get(TestUtils.BASE_URL + "/tasks?name=" + TestUtils.TASK_NAME)
+                            .contentType(MediaType.APPLICATION_JSON)
+            ).andReturn().getResponse();
+
+            assertThat(response.getStatus()).isEqualTo(403);
+        }
+    }
 }
