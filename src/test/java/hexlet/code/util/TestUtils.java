@@ -111,7 +111,7 @@ public class TestUtils {
                 post(USER_CONTROLLER_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(MAPPER.writeValueAsString(userDTO))
-        ).andExpect(status().isOk());
+        ).andExpect(status().isCreated());
     }
 
     public void createStatus(TaskStatusDTO taskStatusDTO) throws Exception {
@@ -120,7 +120,7 @@ public class TestUtils {
                 post(STATUS_CONTROLLER_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(MAPPER.writeValueAsString(taskStatusDTO))
-        ).andExpect(status().isOk());
+        ).andExpect(status().isCreated());
     }
 
     public void createTask(TaskDTO taskDTO) throws Exception {
@@ -128,7 +128,7 @@ public class TestUtils {
         mockMvc.perform(post(BASE_URL + "/tasks")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(MAPPER.writeValueAsString(taskDTO))
-        ).andExpect(status().isOk());
+        ).andExpect(status().isCreated());
     }
 
     public void createLabel(LabelDTO labelDTO) throws Exception {
@@ -136,7 +136,7 @@ public class TestUtils {
         mockMvc.perform(post(BASE_URL + "/labels")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(MAPPER.writeValueAsString(labelDTO))
-        ).andExpect(status().isOk());
+        ).andExpect(status().isCreated());
     }
 
     public String getJwtToken(String email, String password) throws Exception {
