@@ -1,19 +1,14 @@
 package hexlet.code.controller;
 
 import com.rollbar.notifier.Rollbar;
-import hexlet.code.exception.ErrorResponse;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.model.User;
 import hexlet.code.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static hexlet.code.controller.UserController.USER_CONTROLLER_PATH;
 
@@ -65,29 +59,7 @@ public class UserController {
 
     @DeleteMapping(ID)
     @PreAuthorize(ONLY_OWNER_BY_ID)
-    public String deleteUser(@PathVariable long id) {
-        return userService.deleteUser(id);
-
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleException(AccessDeniedException ex) {
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(new ErrorResponse(403, "Access denied"));
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleException(NoSuchElementException ex) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse(404, "The requested item was not found"));
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleException(MethodArgumentNotValidException ex) {
-        return ResponseEntity
-                .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new ErrorResponse(422, "Validation error"));
+    public void deleteUser(@PathVariable long id) {
+        userService.deleteUser(id);
     }
 }

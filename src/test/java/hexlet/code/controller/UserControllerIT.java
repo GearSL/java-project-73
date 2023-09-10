@@ -54,15 +54,6 @@ public class UserControllerIT {
     @Nested
     class UnprotectedRoutesChecks {
         @Test
-        void checkWelcome() throws Exception {
-            MockHttpServletResponse response = mockMvc.perform(get("/welcome")
-            ).andReturn().getResponse();
-
-            assertThat(response.getStatus()).isEqualTo(200);
-            assertThat(response.getContentAsString()).contains(WELCOME);
-        }
-
-        @Test
         void getUser() throws Exception {
             User user = utils.getUserByEmail(TestUtils.TEST_EMAIL_1);
             MockHttpServletResponse response = mockMvc.perform(

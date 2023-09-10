@@ -59,8 +59,8 @@ public class TaskController {
     @PreAuthorize(ONLY_OWNER_BY_ID)
     @DeleteMapping(ID)
     @Operation(summary = "Delete task")
-    public String deleteTask(@PathVariable Long id) {
-        return taskService.deleteTask(id);
+    public void deleteTask(@PathVariable Long id) {
+        taskService.deleteTask(id);
     }
 
     @GetMapping(ID)

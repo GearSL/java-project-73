@@ -44,4 +44,4 @@ JDBC_DATABASE_PASSWORD
 Start application using Dockerfile in project root. 
 
 ### Additional information
-Application have api documentation. You can see it on the link: `http://{host}/swagger-ui`
+Application have api documentation. You can see it on the link: `http://{host}/swagger-ui`. Deployed example you can see [here](https://first-spring-app-ak7y.onrender.com/);
