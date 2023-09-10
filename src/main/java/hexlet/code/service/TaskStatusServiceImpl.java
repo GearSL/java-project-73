@@ -28,10 +28,9 @@ public class TaskStatusServiceImpl implements TaskStatusService {
     }
 
     @Override
-    public String deleteStatus(Long id) {
+    public void deleteStatus(Long id) {
         taskStatusRepository.findById(id).orElseThrow();
         taskStatusRepository.deleteById(id);
-        return "Status successful deleted";
     }
 
     @Override

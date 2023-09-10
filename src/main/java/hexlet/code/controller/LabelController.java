@@ -58,9 +58,8 @@ public class LabelController {
 
     @DeleteMapping(ID)
     @Operation(summary = "Delete label")
-    public String deleteLabel(@PathVariable Long id) {
+    public void deleteLabel(@PathVariable Long id) {
         labelRepository.deleteById(id);
-        return "success";
     }
 
     @GetMapping(ID)

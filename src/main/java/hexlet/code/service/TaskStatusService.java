@@ -9,7 +9,7 @@ public interface TaskStatusService {
 
     TaskStatus createStatus(TaskStatusDTO taskStatusDTO);
     TaskStatus updateStatus(Long id, TaskStatusDTO taskStatusDTO);
-    String deleteStatus(Long id);
+    void deleteStatus(Long id);
     Optional<TaskStatus> getStatusById(Long id);
     List<TaskStatus> getAllStatuses();
 

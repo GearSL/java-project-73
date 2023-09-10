@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface TaskService {
     Task createTask(TaskDTO taskDTO);
     Task updateTask(Long id, TaskUpdateDTO taskUpdateDTO);
-    String deleteTask(Long id);
+    void deleteTask(Long id);
     Optional<Task> getTaskById(Long id);
     List<Task> getAllTaskList();
 }

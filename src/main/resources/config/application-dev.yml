@@ -7,6 +7,10 @@ springdoc:
     path: /swagger-ui.html
 
 spring:
+  output:
+    ansi:
+      enabled: always
+
   datasource:
     username:
     password:

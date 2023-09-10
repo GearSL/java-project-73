@@ -48,8 +48,8 @@ public class TaskStatusController {
 
     @DeleteMapping(ID)
     @Operation(summary = "Delete status")
-    public String deleteStatus(@PathVariable Long id) {
-        return taskStatusService.deleteStatus(id);
+    public void deleteStatus(@PathVariable Long id) {
+        taskStatusService.deleteStatus(id);
     }
 
     @GetMapping(ID)
