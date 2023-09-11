@@ -35,13 +35,13 @@ public class LabelController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create label")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "400", description = "Bad request",
-                    content = @io.swagger.v3.oas.annotations.media.Content),
-            @ApiResponse(responseCode = "401", description = "Unauthorized",
-                    content = @io.swagger.v3.oas.annotations.media.Content),
-            @ApiResponse(responseCode = "403", description = "Forbidden",
-                    content = @io.swagger.v3.oas.annotations.media.Content)
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "400", description = "Bad request",
+                content = @io.swagger.v3.oas.annotations.media.Content),
+        @ApiResponse(responseCode = "401", description = "Unauthorized",
+                content = @io.swagger.v3.oas.annotations.media.Content),
+        @ApiResponse(responseCode = "403", description = "Forbidden",
+                content = @io.swagger.v3.oas.annotations.media.Content)
     })
     public Label createLabel(@Parameter(description = "Label") @RequestBody LabelDTO labelDTO) {
         Label label = new Label(labelDTO.getName());

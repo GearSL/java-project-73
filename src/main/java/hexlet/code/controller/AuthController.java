@@ -27,13 +27,13 @@ public class AuthController {
     @Operation(summary = "Login")
     @PostMapping("/login")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Authorized"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+        @ApiResponse(responseCode = "200", description = "Authorized"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public String createUserToken(@Parameter(description = "User credentials")
                                                  @RequestBody JwtRequestDTO authRequest) {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(),
-                    authRequest.getPassword()));
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(),
+                authRequest.getPassword()));
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getEmail());
 

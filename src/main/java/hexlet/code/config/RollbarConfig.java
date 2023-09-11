@@ -13,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Configuration()
 @EnableWebMvc
 @ComponentScan({
-        "hexlet.code",
+    "hexlet.code",
 })
 public class RollbarConfig {
     @Value("${rollbar.access-token}")
@@ -21,6 +21,8 @@ public class RollbarConfig {
 
     /**
      * Register a Rollbar bean to configure App with Rollbar.
+     *
+     * @return Rollbar object
      */
     @Bean
     public Rollbar rollbar() {

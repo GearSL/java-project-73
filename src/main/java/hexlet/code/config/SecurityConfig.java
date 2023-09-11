@@ -25,24 +25,23 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .cors().disable()
-                .headers().frameOptions().disable()
-                .and()
-                .sessionManagement().disable()
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/*").authenticated()
-                        .requestMatchers("/api/statuses").authenticated()
-                        .requestMatchers("/api/statuses/*").authenticated()
-                        .requestMatchers("/api/tasks").authenticated()
-                        .requestMatchers("/api/tasks/*").authenticated()
-                        .requestMatchers("/api/labels").authenticated()
-                        .requestMatchers("/api/labels/*").authenticated()
-                        .requestMatchers("/**").permitAll()
-                        .anyRequest().permitAll()
-                );
+        http.csrf().disable()
+            .cors().disable()
+            .headers().frameOptions().disable()
+            .and()
+            .sessionManagement().disable()
+            .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+            .authorizeHttpRequests(authorize -> authorize
+                    .requestMatchers(HttpMethod.DELETE, "/api/users/*").authenticated()
+                    .requestMatchers("/api/statuses").authenticated()
+                    .requestMatchers("/api/statuses/*").authenticated()
+                    .requestMatchers("/api/tasks").authenticated()
+                    .requestMatchers("/api/tasks/*").authenticated()
+                    .requestMatchers("/api/labels").authenticated()
+                    .requestMatchers("/api/labels/*").authenticated()
+                    .requestMatchers("/**").permitAll()
+                    .anyRequest().permitAll()
+        );
         return http.build();
     }
 
