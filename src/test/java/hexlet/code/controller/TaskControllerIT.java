@@ -2,7 +2,6 @@ package hexlet.code.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.TaskDTO;
-import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.model.Task;
 import hexlet.code.reporsitory.TaskStatusRepository;
 import hexlet.code.util.TestUtils;
@@ -51,7 +50,6 @@ public class TaskControllerIT {
                 TestUtils.TASK_NAME,
                 TestUtils.TASK_DESCRIPTION,
                 userId,
-                userId,
                 statusId
         );
         utils.createTask(taskDTO);
@@ -95,7 +93,7 @@ public class TaskControllerIT {
             Optional<Task> task = utils.findByName(TestUtils.TASK_NAME);
             Long userId = utils.getUserByEmail(TestUtils.USER_DTO_1.getEmail()).getId();
             Long statusId = utils.getStatusId();
-            TaskUpdateDTO updateDTO = new TaskUpdateDTO(
+            TaskDTO updateDTO = new TaskDTO(
                     "updated name",
                     "updated description",
                     userId,
@@ -120,7 +118,7 @@ public class TaskControllerIT {
             Optional<Task> task = utils.findByName(TestUtils.TASK_NAME);
             Long userId = utils.getUserByEmail(TestUtils.USER_DTO_1.getEmail()).getId();
             Long statusId = utils.getStatusId();
-            TaskUpdateDTO updateDTO = new TaskUpdateDTO(
+            TaskDTO updateDTO = new TaskDTO(
                     "updated name",
                     "updated description",
                     userId,
@@ -146,7 +144,6 @@ public class TaskControllerIT {
             TaskDTO taskDTO = new TaskDTO(
                     taskName,
                     TestUtils.TASK_DESCRIPTION,
-                    userId,
                     userId,
                     statusId
             );

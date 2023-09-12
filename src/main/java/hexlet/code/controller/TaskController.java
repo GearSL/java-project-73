@@ -2,7 +2,6 @@ package hexlet.code.controller;
 
 import com.querydsl.core.types.Predicate;
 import hexlet.code.dto.TaskDTO;
-import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.model.Task;
 import hexlet.code.reporsitory.TaskRepository;
 import hexlet.code.service.TaskService;
@@ -52,8 +51,8 @@ public class TaskController {
 
     @PutMapping(ID)
     @Operation(summary = "Update task")
-    public Task updateTask(@PathVariable Long id, @RequestBody @Valid TaskUpdateDTO taskUpdateDTO) {
-        return taskService.updateTask(id, taskUpdateDTO);
+    public Task updateTask(@PathVariable Long id, @RequestBody @Valid TaskDTO taskDTO) {
+        return taskService.updateTask(id, taskDTO);
     }
 
     @PreAuthorize(ONLY_OWNER_BY_ID)

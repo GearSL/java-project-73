@@ -17,16 +17,14 @@ public class TaskDTO {
     @Length(min = 1)
     private String name;
     private String description;
-    private Long authorId;
     private Long executorId;
     private List<Long> labelIds;
     @NotNull
     private Long taskStatusId;
 
-    public TaskDTO(String taskName, String taskDescription, Long authorId, Long executorId, Long statusId) {
+    public TaskDTO(String taskName, String taskDescription, Long executorId, Long statusId) {
         this.name = taskName;
         this.description = taskDescription;
-        this.authorId = authorId;
         this.executorId = executorId;
         this.taskStatusId = statusId;
     }

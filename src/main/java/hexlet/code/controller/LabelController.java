@@ -70,7 +70,7 @@ public class LabelController {
 
     @GetMapping
     @Operation(summary = "Get all labels")
-    public List<Label> getLabel() {
+    public List<Label> getLabels() {
         return labelRepository.findAll();
     }
 }
