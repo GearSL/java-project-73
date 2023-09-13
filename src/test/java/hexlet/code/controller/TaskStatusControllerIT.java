@@ -1,6 +1,9 @@
 package hexlet.code.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.model.TaskStatus;
+import hexlet.code.reporsitory.TaskStatusRepository;
 import hexlet.code.util.TestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -24,6 +29,8 @@ public class TaskStatusControllerIT {
     private MockMvc mockMvc;
     @Autowired
     private TestUtils utils;
+    @Autowired
+    private TaskStatusRepository taskStatusRepository;
     private static final String BASE_URL = "/api";
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -49,8 +56,14 @@ public class TaskStatusControllerIT {
                             .header("Authorization", "Bearer "
                                     + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
             ).andReturn().getResponse();
+
+            List<TaskStatus> taskStatusList = taskStatusRepository.findAll();
+            List<TaskStatus> responseTaskStatusList = TestUtils.fromJson(response.getContentAsString(),
+                    new TypeReference<>() { });
+
             assertThat(response.getStatus()).isEqualTo(200);
             assertThat(response.getContentAsString()).contains(TestUtils.TEST_STATUS_1);
+            assertThat(taskStatusList).containsAll(responseTaskStatusList);
         }
 
         @Test

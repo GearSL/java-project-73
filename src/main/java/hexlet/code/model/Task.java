@@ -14,13 +14,14 @@ import jakarta.persistence.Temporal;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.Length;
 
-import java.time.Instant;
+import java.util.Date;
 import java.util.Set;
 
 import static jakarta.persistence.TemporalType.TIMESTAMP;
@@ -31,6 +32,7 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 @AllArgsConstructor
 @Builder
 @Entity
+@EqualsAndHashCode(of = {"id"})
 @Table(name = "tasks")
 public class Task {
 
@@ -56,6 +58,6 @@ public class Task {
     private Set<Label> labels;
     @CreationTimestamp
     @Temporal(TIMESTAMP)
-    private Instant createdAt;
+    private Date createdAt;
 
 }

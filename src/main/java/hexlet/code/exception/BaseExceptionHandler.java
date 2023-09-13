@@ -20,7 +20,7 @@ import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 public class BaseExceptionHandler {
     @ResponseStatus(FORBIDDEN)
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleException(AccessDeniedException ex) {
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex) {
         return ResponseEntity
                 .status(FORBIDDEN)
                 .body(new ErrorResponse(403, "Access denied"));
@@ -28,7 +28,7 @@ public class BaseExceptionHandler {
 
     @ResponseStatus(NOT_FOUND)
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<ErrorResponse> handleException(NoSuchElementException ex) {
+    public ResponseEntity<ErrorResponse> handleNoSuchElementException(NoSuchElementException ex) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse(404, "The requested item was not found"));
@@ -36,7 +36,7 @@ public class BaseExceptionHandler {
 
     @ResponseStatus(UNPROCESSABLE_ENTITY)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         return ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(new ErrorResponse(422, "Validation error"));

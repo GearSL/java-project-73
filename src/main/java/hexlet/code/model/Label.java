@@ -10,6 +10,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotBlank;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,6 +23,7 @@ import java.util.Set;
 @Entity
 @Setter
 @Getter
+@EqualsAndHashCode(of = {"id"})
 @Table(name = "labels")
 @NoArgsConstructor
 public class Label {

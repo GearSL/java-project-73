@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -30,7 +30,7 @@ public class LabelControllerIT {
     private TestUtils utils;
     @Autowired
     private LabelRepository labelRepository;
-        private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @BeforeEach
     void init() throws Exception {
@@ -55,15 +55,13 @@ public class LabelControllerIT {
         ).andReturn().getResponse();
 
         List<Label> labelList = labelRepository.findAll();
-        List<Label> responseLabels = MAPPER.readValue(response.getContentAsString(), new TypeReference<>() { });
+        List<Label> responseLabels = TestUtils.fromJson(response.getContentAsString(), new TypeReference<>() { });
 
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(labelRepository.findAll().isEmpty()).isFalse();
         assertThat(response.getContentAsString()).contains(TestUtils.LABEL_NAME_1);
         assertThat(response.getContentAsString()).contains(TestUtils.LABEL_NAME_2);
-        // TODO: один из описанных ниже вариантов должен работать, необходимо понять почему не работает "containsAll"
-        //assertThat(responseLabels.containsAll(labelList)).isTrue();
-        //Assertions.assertThat(responseLabels).containsAll(labelList);
+        assertThat(labelList).containsAll(responseLabels);
     }
 
     @Test

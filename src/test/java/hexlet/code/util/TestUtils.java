@@ -1,5 +1,7 @@
 package hexlet.code.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.controller.LabelController;
 import hexlet.code.controller.TaskStatusController;
@@ -149,6 +151,10 @@ public class TestUtils {
                 .content(MAPPER.writeValueAsString(requestDTO))
         ).andReturn().getResponse();
         return authResponse.getContentAsString();
+    }
+
+    public static <T> T fromJson(final String json, final TypeReference<T> to) throws JsonProcessingException {
+        return MAPPER.readValue(json, to);
     }
 
     public void tearDown() {
