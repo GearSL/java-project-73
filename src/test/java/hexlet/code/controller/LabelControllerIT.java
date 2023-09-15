@@ -59,9 +59,7 @@ public class LabelControllerIT {
 
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(labelRepository.findAll().isEmpty()).isFalse();
-        assertThat(response.getContentAsString()).contains(TestUtils.LABEL_NAME_1);
-        assertThat(response.getContentAsString()).contains(TestUtils.LABEL_NAME_2);
-        assertThat(labelList).containsAll(responseLabels);
+        assertThat(responseLabels).containsAll(labelList);
     }
 
     @Test

@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.validation.constraints.NotBlank;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -17,6 +18,7 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 
 @Getter
 @Setter
+@EqualsAndHashCode(of = {"id"})
 @Entity
 @Table(name = "users")
 public class User {

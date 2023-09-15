@@ -17,8 +17,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
@@ -31,7 +34,6 @@ public class TaskStatusControllerIT {
     private TestUtils utils;
     @Autowired
     private TaskStatusRepository taskStatusRepository;
-    private static final String BASE_URL = "/api";
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @BeforeEach
@@ -62,7 +64,6 @@ public class TaskStatusControllerIT {
                     new TypeReference<>() { });
 
             assertThat(response.getStatus()).isEqualTo(200);
-            assertThat(response.getContentAsString()).contains(TestUtils.TEST_STATUS_1);
             assertThat(taskStatusList).containsAll(responseTaskStatusList);
         }
 
@@ -82,15 +83,20 @@ public class TaskStatusControllerIT {
     class AuthorizedRoutesCheck {
         @Test
         void putStatusById() throws Exception {
+            Long taskStatusId = utils.getStatusId();
+
             MockHttpServletResponse putResponse = mockMvc.perform(
-                    put(TestUtils.STATUS_CONTROLLER_PATH + "/" + utils.getStatusId())
+                    put(TestUtils.STATUS_CONTROLLER_PATH + "/" + taskStatusId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .header("Authorization", "Bearer "
                                     + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
                             .content(MAPPER.writeValueAsString(TestUtils.TASK_STATUS_DTO_2))
             ).andReturn().getResponse();
+
+            TaskStatus taskStatus = taskStatusRepository.findById(taskStatusId).orElseThrow();
+
             assertThat(putResponse.getStatus()).isEqualTo(200);
-            assertThat(putResponse.getContentAsString()).contains(TestUtils.TEST_STATUS_2);
+            assertThat(putResponse.getContentAsString()).contains(taskStatus.getName());
         }
 
         @Test
@@ -100,6 +106,33 @@ public class TaskStatusControllerIT {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(MAPPER.writeValueAsString(TestUtils.TASK_STATUS_DTO_2))
             ).andReturn().getResponse();
+            assertThat(response.getStatus()).isEqualTo(403);
+        }
+
+        @Test
+        void deleteStatus() throws Exception {
+            Long taskStatusId = utils.getStatusId();
+
+            MockHttpServletResponse response = mockMvc.perform(
+                    delete(TestUtils.STATUS_CONTROLLER_PATH + "/" + taskStatusId)
+                            .header("Authorization", "Bearer "
+                                    + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
+            ).andReturn().getResponse();
+            Throwable exception = assertThrows(NoSuchElementException.class,
+                    () -> taskStatusRepository.findById(taskStatusId).orElseThrow());
+
+            assertThat(response.getStatus()).isEqualTo(200);
+            assertThat(exception.getMessage()).contains("No value present");
+        }
+
+        @Test
+        void deleteStatusFailed() throws Exception {
+            Long taskStatusId = utils.getStatusId();
+
+            MockHttpServletResponse response = mockMvc.perform(
+                    delete(TestUtils.STATUS_CONTROLLER_PATH + "/" + taskStatusId)
+            ).andReturn().getResponse();
+
             assertThat(response.getStatus()).isEqualTo(403);
         }
     }

@@ -17,7 +17,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.Length;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Set;
 
 @Entity
@@ -38,7 +38,7 @@ public class Label {
     private Set<Task> tasks;
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private Instant createdAt;
 
     public Label(String name) {
         this.name = name;

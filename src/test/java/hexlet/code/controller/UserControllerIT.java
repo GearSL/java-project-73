@@ -1,5 +1,6 @@
 package hexlet.code.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.model.User;
@@ -16,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import static hexlet.code.util.TestUtils.USER_CONTROLLER_PATH;
@@ -60,7 +62,9 @@ public class UserControllerIT {
                     get(USER_CONTROLLER_PATH + "/" + user.getId())
             ).andReturn().getResponse();
             assertThat(response.getStatus()).isEqualTo(200);
-            assertThat(response.getContentAsString()).contains(TestUtils.TEST_EMAIL_1);
+            assertThat(response.getContentAsString()).contains(user.getEmail());
+            assertThat(response.getContentAsString()).contains(user.getFirstName());
+            assertThat(response.getContentAsString()).contains(user.getLastName());
         }
 
         @Test
@@ -68,9 +72,12 @@ public class UserControllerIT {
             MockHttpServletResponse response = mockMvc.perform(
                     get(USER_CONTROLLER_PATH)
             ).andReturn().getResponse();
+
+            List<User> userList = userRepository.findAll();
+            List<User> userListResponse = TestUtils.fromJson(response.getContentAsString(), new TypeReference<>() { });
+
             assertThat(response.getStatus()).isEqualTo(200);
-            assertThat(response.getContentAsString()).contains(TestUtils.TEST_EMAIL_1);
-            assertThat(response.getContentAsString()).contains(TestUtils.TEST_EMAIL_2);
+            assertThat(userListResponse).containsAll(userList);
         }
     }
 

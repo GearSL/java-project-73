@@ -1,9 +1,10 @@
 package hexlet.code.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.TaskDTO;
 import hexlet.code.model.Task;
-import hexlet.code.reporsitory.TaskStatusRepository;
+import hexlet.code.reporsitory.TaskRepository;
 import hexlet.code.util.TestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +17,13 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -31,7 +33,7 @@ public class TaskControllerIT {
     @Autowired
     private TestUtils utils;
     @Autowired
-    private TaskStatusRepository taskStatusRepository;
+    private TaskRepository taskRepository;
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
 
@@ -67,8 +69,13 @@ public class TaskControllerIT {
             Optional<Task> task = utils.findByName(TestUtils.TASK_NAME);
             MockHttpServletResponse response = mockMvc.perform(
                     get(TestUtils.BASE_URL + "/tasks/" + task.get().getId())
+                            .header("Authorization", "Bearer "
+                                    + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
                             .contentType(MediaType.APPLICATION_JSON)
             ).andReturn().getResponse();
+
+            assertThat(response.getStatus()).isEqualTo(200);
+            assertThat(response.getContentAsString()).contains(task.get().getName());
         }
 
         @Test
@@ -80,9 +87,12 @@ public class TaskControllerIT {
                             .contentType(MediaType.APPLICATION_JSON)
             ).andExpect(status().isOk()).andReturn().getResponse();
 
+            List<Task> taskList = taskRepository.findAll();
+            List<Task> taskListResponse = TestUtils.fromJson(response.getContentAsString(), new TypeReference<>() { });
+
             assertThat(response.getStatus()).isEqualTo(200);
             assertThat(response.getContentAsString()).isNotBlank();
-            assertThat(response.getContentAsString()).contains(TestUtils.TASK_NAME);
+            assertThat(taskListResponse).containsAll(taskList);
         }
     }
 

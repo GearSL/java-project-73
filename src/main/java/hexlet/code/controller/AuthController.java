@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,7 +32,7 @@ public class AuthController {
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public String createUserToken(@Parameter(description = "User credentials")
-                                                 @RequestBody JwtRequestDTO authRequest) {
+                                                 @RequestBody @Valid JwtRequestDTO authRequest) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(),
                 authRequest.getPassword()));
 

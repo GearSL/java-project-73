@@ -11,9 +11,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import java.time.Instant;
 
 import static jakarta.persistence.TemporalType.TIMESTAMP;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -28,7 +28,7 @@ public class TaskStatus {
     private String name;
     @CreationTimestamp
     @Temporal(TIMESTAMP)
-    private Date createdAt;
+    private Instant createdAt;
 
     public TaskStatus(String name) {
         this.name = name;

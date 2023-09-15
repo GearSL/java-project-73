@@ -5,6 +5,7 @@ import hexlet.code.model.TaskStatus;
 import hexlet.code.service.TaskStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,13 +37,13 @@ public class TaskStatusController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create status")
-    public TaskStatus createStatus(@RequestBody TaskStatusDTO taskStatusDTO) {
+    public TaskStatus createStatus(@RequestBody @Valid TaskStatusDTO taskStatusDTO) {
         return taskStatusService.createStatus(taskStatusDTO);
     }
 
     @PutMapping(ID)
     @Operation(summary = "Update status")
-    public TaskStatus updateStatus(@PathVariable Long id, @RequestBody TaskStatusDTO taskStatusDTO) {
+    public TaskStatus updateStatus(@PathVariable Long id, @RequestBody @Valid TaskStatusDTO taskStatusDTO) {
         return taskStatusService.updateStatus(id, taskStatusDTO);
     }
 

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,14 +44,14 @@ public class LabelController {
         @ApiResponse(responseCode = "403", description = "Forbidden",
                 content = @io.swagger.v3.oas.annotations.media.Content)
     })
-    public Label createLabel(@Parameter(description = "Label") @RequestBody LabelDTO labelDTO) {
+    public Label createLabel(@Parameter(description = "Label") @RequestBody @Valid LabelDTO labelDTO) {
         Label label = new Label(labelDTO.getName());
         return labelRepository.save(label);
     }
 
     @PutMapping(ID)
     @Operation(summary = "Update label")
-    public Label updateLabel(@PathVariable Long id, @RequestBody LabelDTO labelDTO) {
+    public Label updateLabel(@PathVariable Long id, @RequestBody @Valid LabelDTO labelDTO) {
         Label label = labelRepository.findById(id).orElseThrow();
         label.setName(labelDTO.getName());
         return labelRepository.save(label);

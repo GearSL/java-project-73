@@ -3,6 +3,7 @@ package hexlet.code.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import hexlet.code.controller.LabelController;
 import hexlet.code.controller.TaskStatusController;
 import hexlet.code.controller.UserController;
@@ -78,7 +79,7 @@ public class TestUtils {
     public static final LabelDTO LABEL_DTO_1 = new LabelDTO(LABEL_NAME_1);
     public static final LabelDTO LABEL_DTO_2 = new LabelDTO(LABEL_NAME_2);
 
-    public static final ObjectMapper MAPPER = new ObjectMapper();
+    public static final ObjectMapper MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
     @Autowired
     public void setWebApplicationContext(WebApplicationContext webApplicationContext) {
