@@ -3,8 +3,8 @@ package hexlet.code.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import hexlet.code.controller.LabelController;
+import hexlet.code.controller.TaskController;
 import hexlet.code.controller.TaskStatusController;
 import hexlet.code.controller.UserController;
 import hexlet.code.dto.JwtRequestDTO;
@@ -58,6 +58,7 @@ public class TestUtils {
     public static final String LABEL_NAME_2 = "Test label 2";
     public static final String BASE_URL = "/api";
     public static final String USER_CONTROLLER_PATH = BASE_URL + UserController.USER_CONTROLLER_PATH;
+    public static final String TASK_CONTROLLER_PATH = BASE_URL + TaskController.TASK_CONTROLLER_PATH;
     public static final String STATUS_CONTROLLER_PATH = BASE_URL + TaskStatusController.STATUS_CONTROLLER_PATH;
     public static final String LABEL_CONTROLLER_PATH = BASE_URL + LabelController.LABEL_CONTROLLER_PATH;
 
@@ -79,7 +80,7 @@ public class TestUtils {
     public static final LabelDTO LABEL_DTO_1 = new LabelDTO(LABEL_NAME_1);
     public static final LabelDTO LABEL_DTO_2 = new LabelDTO(LABEL_NAME_2);
 
-    public static final ObjectMapper MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
+    public static final ObjectMapper MAPPER = new ObjectMapper().findAndRegisterModules();
 
     @Autowired
     public void setWebApplicationContext(WebApplicationContext webApplicationContext) {

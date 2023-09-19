@@ -2,6 +2,7 @@ package hexlet.code.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.dto.TaskStatusDTO;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.reporsitory.TaskStatusRepository;
 import hexlet.code.util.TestUtils;
@@ -23,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 @SpringBootTest
@@ -82,6 +84,25 @@ public class TaskStatusControllerIT {
     @Nested
     class AuthorizedRoutesCheck {
         @Test
+        void createTaskStatus() throws Exception {
+            TaskStatusDTO taskStatusDTO = new TaskStatusDTO("Creating status check");
+
+            MockHttpServletResponse response = mockMvc.perform(
+                    post(TestUtils.STATUS_CONTROLLER_PATH)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer "
+                                    + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
+                            .content(MAPPER.writeValueAsString(taskStatusDTO))
+
+            ).andReturn().getResponse();
+            TaskStatus responseTaskStatus = TestUtils.fromJson(response.getContentAsString(),
+                    new TypeReference<>() { });
+
+            assertThat(response.getStatus()).isEqualTo(201);
+            assertThat(taskStatusRepository.getReferenceById(responseTaskStatus.getId())).isNotNull();
+        }
+
+        @Test
         void putStatusById() throws Exception {
             Long taskStatusId = utils.getStatusId();
 
@@ -96,7 +117,10 @@ public class TaskStatusControllerIT {
             TaskStatus taskStatus = taskStatusRepository.findById(taskStatusId).orElseThrow();
 
             assertThat(putResponse.getStatus()).isEqualTo(200);
+            // check that response contain updated data
             assertThat(putResponse.getContentAsString()).contains(taskStatus.getName());
+            // check that DB contain updated data
+            assertThat(taskStatus.getName()).isEqualTo(TestUtils.TASK_STATUS_DTO_2.getName());
         }
 
         @Test
@@ -110,7 +134,7 @@ public class TaskStatusControllerIT {
         }
 
         @Test
-        void deleteStatus() throws Exception {
+        void successDeleteStatus() throws Exception {
             Long taskStatusId = utils.getStatusId();
 
             MockHttpServletResponse response = mockMvc.perform(
@@ -123,10 +147,11 @@ public class TaskStatusControllerIT {
 
             assertThat(response.getStatus()).isEqualTo(200);
             assertThat(exception.getMessage()).contains("No value present");
+            assertThat(taskStatusRepository.existsById(taskStatusId)).isFalse();
         }
 
         @Test
-        void deleteStatusFailed() throws Exception {
+        void failedDeleteStatus() throws Exception {
             Long taskStatusId = utils.getStatusId();
 
             MockHttpServletResponse response = mockMvc.perform(

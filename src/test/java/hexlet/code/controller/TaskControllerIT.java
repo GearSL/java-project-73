@@ -16,12 +16,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -68,7 +67,7 @@ public class TaskControllerIT {
         void getTaskById() throws Exception {
             Optional<Task> task = utils.findByName(TestUtils.TASK_NAME);
             MockHttpServletResponse response = mockMvc.perform(
-                    get(TestUtils.BASE_URL + "/tasks/" + task.get().getId())
+                    MockMvcRequestBuilders.get(TestUtils.BASE_URL + "/tasks/" + task.get().getId())
                             .header("Authorization", "Bearer "
                                     + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
                             .contentType(MediaType.APPLICATION_JSON)
@@ -81,7 +80,7 @@ public class TaskControllerIT {
         @Test
         void getTaskList() throws Exception {
             MockHttpServletResponse response = mockMvc.perform(
-                    get(TestUtils.BASE_URL + "/tasks")
+                    MockMvcRequestBuilders.get(TestUtils.BASE_URL + "/tasks")
                             .header("Authorization", "Bearer "
                                     + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
                             .contentType(MediaType.APPLICATION_JSON)
@@ -99,28 +98,60 @@ public class TaskControllerIT {
     @Nested
     class AuthorizedRoutesCheck {
         @Test
-        void successUpdateTask() throws Exception {
-            Optional<Task> task = utils.findByName(TestUtils.TASK_NAME);
+        void createTask() throws Exception {
+            String taskName = "Some task name";
+            String taskDescription = "Some description";
             Long userId = utils.getUserByEmail(TestUtils.USER_DTO_1.getEmail()).getId();
             Long statusId = utils.getStatusId();
-            TaskDTO updateDTO = new TaskDTO(
-                    "updated name",
-                    "updated description",
+            TaskDTO taskDTO = new TaskDTO(
+                    taskName,
+                    taskDescription,
+                    userId,
+                    statusId
+            );
+
+            MockHttpServletResponse response = mockMvc.perform(
+                    MockMvcRequestBuilders.post(TestUtils.TASK_CONTROLLER_PATH)
+                            .header("Authorization", "Bearer "
+                            + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(MAPPER.writeValueAsString(taskDTO))
+            ).andReturn().getResponse();
+
+            assertThat(response.getStatus()).isEqualTo(201);
+
+        }
+
+        @Test
+        void successUpdateTask() throws Exception {
+            Long taskId = utils.findByName(TestUtils.TASK_NAME).orElseThrow().getId();
+            String taskName = "Some name";
+            String taskDescription = "updated description";
+            Long userId = utils.getUserByEmail(TestUtils.USER_DTO_1.getEmail()).getId();
+            Long statusId = utils.getStatusId();
+
+            TaskDTO updateTaskDTO = new TaskDTO(
+                    taskName,
+                    taskDescription,
                     userId,
                     statusId
             );
             MockHttpServletResponse response = mockMvc.perform(
-                    put(TestUtils.BASE_URL + "/tasks/" + task.get().getId())
+                    MockMvcRequestBuilders.put(TestUtils.TASK_CONTROLLER_PATH + "/" + taskId)
                             .header("Authorization", "Bearer "
                                     + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(MAPPER.writeValueAsString(updateDTO))
+                            .content(MAPPER.writeValueAsString(updateTaskDTO))
             ).andReturn().getResponse();
+
+            Task updatedTask = taskRepository.findById(taskId).orElseThrow();
 
             assertThat(response.getStatus()).isEqualTo(200);
             assertThat(response.getContentAsString()).isNotBlank();
-            assertThat(response.getContentAsString()).contains("updated name");
-            assertThat(response.getContentAsString()).contains("updated description");
+            assertThat(response.getContentAsString()).contains(taskName);
+            assertThat(response.getContentAsString()).contains(taskDescription);
+            assertThat(updatedTask.getName()).isEqualTo(taskName);
+            assertThat(updatedTask.getDescription()).isEqualTo(taskDescription);
         }
 
         @Test
@@ -135,11 +166,44 @@ public class TaskControllerIT {
                     statusId
             );
             MockHttpServletResponse response = mockMvc.perform(
-                    put(TestUtils.BASE_URL + "/tasks/" + task.get().getId())
+                    MockMvcRequestBuilders.put(TestUtils.BASE_URL + "/tasks/" + task.get().getId())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(MAPPER.writeValueAsString(updateDTO))
             ).andReturn().getResponse();
             assertThat(response.getStatus()).isEqualTo(403);
+        }
+
+        @Test
+        void successDeleteTask() throws Exception {
+            Long userId = utils.getUserByEmail(TestUtils.USER_DTO_1.getEmail()).getId();
+            Long statusId = utils.getStatusId();
+            TaskDTO taskDTO = new TaskDTO(
+                    "Task for delete",
+                    "Task description",
+                    userId,
+                    statusId
+            );
+
+            MockHttpServletResponse createResponse = mockMvc.perform(
+                    MockMvcRequestBuilders.post(TestUtils.TASK_CONTROLLER_PATH)
+                            .header("Authorization", "Bearer "
+                            + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(MAPPER.writeValueAsString(taskDTO))
+            ).andReturn().getResponse();
+
+            Task task = TestUtils.fromJson(createResponse.getContentAsString(), new TypeReference<>() { });
+            Long taskId = task.getId();
+
+            MockHttpServletResponse deleteResponse = mockMvc.perform(
+                    MockMvcRequestBuilders.delete(TestUtils.TASK_CONTROLLER_PATH + "/" + taskId)
+                            .header("Authorization", "Bearer "
+                            + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
+                            .contentType(MediaType.APPLICATION_JSON)
+            ).andReturn().getResponse();
+
+            assertThat(deleteResponse.getStatus()).isEqualTo(200);
+            assertThat(taskRepository.existsById(taskId)).isFalse();
         }
     }
 
@@ -160,7 +224,7 @@ public class TaskControllerIT {
             utils.createTask(taskDTO);
             // check filter
             MockHttpServletResponse response = mockMvc.perform(
-                    get(TestUtils.BASE_URL + "/tasks?name=" + TestUtils.TASK_NAME)
+                    MockMvcRequestBuilders.get(TestUtils.BASE_URL + "/tasks?name=" + TestUtils.TASK_NAME)
                             .header("Authorization", "Bearer "
                                     + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
                             .contentType(MediaType.APPLICATION_JSON)
@@ -175,7 +239,7 @@ public class TaskControllerIT {
         @Test
         void failedFilter() throws Exception {
             MockHttpServletResponse response = mockMvc.perform(
-                    get(TestUtils.BASE_URL + "/tasks?name=" + TestUtils.TASK_NAME)
+                    MockMvcRequestBuilders.get(TestUtils.BASE_URL + "/tasks?name=" + TestUtils.TASK_NAME)
                             .contentType(MediaType.APPLICATION_JSON)
             ).andReturn().getResponse();
 

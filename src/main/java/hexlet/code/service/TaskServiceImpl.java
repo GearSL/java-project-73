@@ -34,7 +34,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Task updateTask(Long id, TaskDTO taskDTO) {
-        return taskRepository.save(fromDto(taskDTO));
+        Task task = fromDto(taskDTO);
+        task.setId(id);
+        return taskRepository.save(task);
     }
 
     private Task fromDto(final TaskDTO taskDTO) {
