@@ -67,14 +67,14 @@ public class TaskControllerIT {
         void getTaskById() throws Exception {
             Optional<Task> task = utils.findByName(TestUtils.TASK_NAME);
             MockHttpServletResponse response = mockMvc.perform(
-                    MockMvcRequestBuilders.get(TestUtils.BASE_URL + "/tasks/" + task.get().getId())
+                    MockMvcRequestBuilders.get(TestUtils.BASE_URL + "/tasks/" + task.orElseThrow().getId())
                             .header("Authorization", "Bearer "
                                     + utils.getJwtToken(TestUtils.TEST_EMAIL_1, TestUtils.TEST_PASSWORD_1))
                             .contentType(MediaType.APPLICATION_JSON)
             ).andReturn().getResponse();
 
             assertThat(response.getStatus()).isEqualTo(200);
-            assertThat(response.getContentAsString()).contains(task.get().getName());
+            assertThat(response.getContentAsString()).contains(task.orElseThrow().getName());
         }
 
         @Test
@@ -99,13 +99,13 @@ public class TaskControllerIT {
     class AuthorizedRoutesCheck {
         @Test
         void createTask() throws Exception {
-            String taskName = "Some task name";
-            String taskDescription = "Some description";
+            String taskNameToCreate = "Some task name";
+            String taskDescriptionToCreate = "Some description";
             Long userId = utils.getUserByEmail(TestUtils.USER_DTO_1.getEmail()).getId();
             Long statusId = utils.getStatusId();
             TaskDTO taskDTO = new TaskDTO(
-                    taskName,
-                    taskDescription,
+                    taskNameToCreate,
+                    taskDescriptionToCreate,
                     userId,
                     statusId
             );
@@ -119,20 +119,21 @@ public class TaskControllerIT {
             ).andReturn().getResponse();
 
             assertThat(response.getStatus()).isEqualTo(201);
-
+            assertThat(response.getContentAsString()).contains(taskNameToCreate);
+            assertThat(response.getContentAsString()).contains(taskDescriptionToCreate);
         }
 
         @Test
         void successUpdateTask() throws Exception {
             Long taskId = utils.findByName(TestUtils.TASK_NAME).orElseThrow().getId();
-            String taskName = "Some name";
-            String taskDescription = "updated description";
+            String taskNameToUpdate = "Some name";
+            String taskDescriptionToUpdate = "updated description";
             Long userId = utils.getUserByEmail(TestUtils.USER_DTO_1.getEmail()).getId();
             Long statusId = utils.getStatusId();
 
             TaskDTO updateTaskDTO = new TaskDTO(
-                    taskName,
-                    taskDescription,
+                    taskNameToUpdate,
+                    taskDescriptionToUpdate,
                     userId,
                     statusId
             );
@@ -148,10 +149,10 @@ public class TaskControllerIT {
 
             assertThat(response.getStatus()).isEqualTo(200);
             assertThat(response.getContentAsString()).isNotBlank();
-            assertThat(response.getContentAsString()).contains(taskName);
-            assertThat(response.getContentAsString()).contains(taskDescription);
-            assertThat(updatedTask.getName()).isEqualTo(taskName);
-            assertThat(updatedTask.getDescription()).isEqualTo(taskDescription);
+            assertThat(response.getContentAsString()).contains(taskNameToUpdate);
+            assertThat(response.getContentAsString()).contains(taskDescriptionToUpdate);
+            assertThat(updatedTask.getName()).isEqualTo(taskNameToUpdate);
+            assertThat(updatedTask.getDescription()).isEqualTo(taskDescriptionToUpdate);
         }
 
         @Test
